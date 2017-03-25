@@ -19,7 +19,7 @@ export default class App extends React.Component {
 	}
 	render() {
 		return (<svg viewBox="0 0 100 150">
-			<Player x={this.state.x}></Player>
+			<Player x={this.state.x} dx={this.state.dx}></Player>
 			{this.state.platforms.map((platform, index) => <Platform key={index} x={platform.x} y={platform.y} />)}
 		</svg>);
 	}
@@ -28,7 +28,8 @@ export default class App extends React.Component {
 		MainLoop.setUpdate(this.updateLoop.bind(this)).setDraw(() => this.forceUpdate()).start();
 	}
 	updateLoop() {
-		this.state.x += input.getX();
+		this.state.dx = input.getX();
+		this.state.x += this.state.dx;
 		if(this.state.x >= 80) {
 			this.state.x = 80;
 		}

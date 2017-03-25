@@ -12,4 +12,4 @@ export default class Platform extends React.Component {
 	}
 }
 
-Platform.height = 15;
+Platform.height = 10;
