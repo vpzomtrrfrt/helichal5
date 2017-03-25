@@ -1,3 +1,9 @@
 .player {
-	fill: red
+	fill: red;
+	.eye {
+		fill: yellow;
+		.pupil {
+			fill: black;
+		}
+	}
 }
