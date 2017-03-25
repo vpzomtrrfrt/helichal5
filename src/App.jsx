@@ -41,13 +41,26 @@ var States = {
 	}
 };
 
-var GameModes = {
-	FreeFly: {
-		id: 1,
-		color: "red",
-		name: "Free Fly"
+var GameModes = (function() {
+	function create(id, color, name, extra) {
+		var tr = {
+			id: id,
+			color: color,
+			name: name,
+			playerSpeed: 1,
+			platformSpeed: 1
+		};
+		if(extra) {
+			for(var k in extra) {
+				tr[k] = extra[k];
+			}
+		}
+		return tr;
 	}
-};
+	return {
+		FreeFly: create(1, "red", "Free Fly")
+	};
+})();
 
 var pclrs = ["red", "lime", "cyan", "orange"];
 export default class App extends React.Component {
@@ -69,6 +82,20 @@ export default class App extends React.Component {
 	set highScore(value) {
 		localStorage.setItem(this.highScoreKey, value);
 	}
+	get playerSpeed() {
+		var tr = 1/5;
+		if(this.state.mode) {
+			tr *= this.state.mode.playerSpeed;
+		}
+		return tr;
+	}
+	get platformSpeed() {
+		var tr = 2/5;
+		if(this.state.mode) {
+			tr *= this.state.mode.platformSpeed;
+		}
+		return tr;
+	}
 	constructor() {
 		super();
 		this.state = {};
@@ -88,7 +115,7 @@ export default class App extends React.Component {
 	start(gamemode) {
 		this.state = {
 			x: 40,
-			y: 150-Player.size,
+			y: 150-Player.height,
 			platforms: [{x: 35, y: 100, id: 1}],
 			score: 0,
 			state: States.STARTING,
@@ -174,9 +201,9 @@ export default class App extends React.Component {
 	updateLoop() {
 		this.state.dx = input.getX();
 		if(this.state.state.move) {
-			this.state.x += this.state.dx/5;
-			if(this.state.x >= 100-Player.size) {
-				this.state.x = 100-Player.size;
+			this.state.x += this.state.dx*this.playerSpeed;
+			if(this.state.x >= 100-Player.width) {
+				this.state.x = 100-Player.width;
 			}
 			else if(this.state.x <= 0) {
 				this.state.x = 0;
@@ -185,16 +212,16 @@ export default class App extends React.Component {
 			if(this.isGM(GameModes.FreeFly)) {
 				var dy = input.getY();
 				this.state.y += dy/5;
-				if(this.state.y >= 150-Player.size) {
-					this.state.y = 150-Player.size;
+				if(this.state.y >= 150-Player.height) {
+					this.state.y = 150-Player.height;
 				}
 			}
 
 			this.state.platforms.forEach((platform) => {
-				platform.y += 0.4;
+				platform.y += this.platformSpeed;
 
 				var py = this.state.y;
-				if(py < platform.y+Platform.height && py+Player.size > platform.y && (this.state.x < platform.x || this.state.x+Player.size > platform.x+30)) {
+				if(py < platform.y+Platform.height && py+Player.height > platform.y && (this.state.x < platform.x || this.state.x+Player.width > platform.x+30)) {
 					console.log("death by:", platform);
 					this.state.state = States.DEAD;
 				}
@@ -212,13 +239,18 @@ export default class App extends React.Component {
 			});
 		}
 		if(this.state.state.genPlatforms) {
-			if(this.state.platforms[this.state.platforms.length-1].y > Math.min(this.state.y, 0)) {
-				var lp = this.state.platforms[this.state.platforms.length-1];
-				var npx = Math.floor(Math.random()*80);
-				var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*(this.isGM(2)?2:1)/((5-Math.random()*(4-this.state.score/100))), 150));
-				if(!isNaN(nph)) {
-					this.state.platforms.push({x: npx, y: nph, id: Math.random()});
+			if(this.state.platforms && this.state.platforms.length > 0) {
+				if(this.state.platforms[this.state.platforms.length-1].y > Math.min(this.state.y, 0)) {
+					var lp = this.state.platforms[this.state.platforms.length-1];
+					var npx = Math.floor(Math.random()*80);
+					var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*(this.isGM(2)?2:1)/((5-Math.random()*(4-this.state.score/100))), 150));
+					if(!isNaN(nph)) {
+						this.state.platforms.push({x: npx, y: nph, id: Math.random()});
+					}
 				}
+			}
+			else {
+				console.log(this.state);
 			}
 		}
 		if(this.state.state.mainMenu) {
