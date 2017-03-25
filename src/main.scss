@@ -1,5 +1,4 @@
 .player {
-	fill: red;
 	.eye {
 		fill: yellow;
 		.pupil {
@@ -12,28 +11,61 @@
 	fill: blue;
 }
 
+.score {
+	font-size: .5em
+}
+
+.overlay {
+	fill: rgba(255, 255, 255, 0.4);
+}
+
+.menuText {
+	font-family: monospace;
+	&.small {
+		font-size: .4em;
+	}
+}
+
 * {
 	margin: 0;
 	padding: 0;
 }
 
 html {
-	overflow-y: hidden
+	overflow-y: hidden;
+	height: 100%;
 }
 
 body {
 	position: relative;
 	background-color: black;
+	height: 100%;
 }
 
 #app {
-	display: inline-block;
-	position: absolute;
-	left: 50%;
-	transform: translateX(-50%);
+	width: 100%;
 	svg {
 		background-color: white;
 		object-fit: scale-down;
-		height: 100vh;
+		height: 100%;
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+
+		* {
+			user-select: none
+		}
+	}
+}
+
+@media screen and (max-aspect-ratio: 2/3) {
+	#app {
+		display: inline-block;
+		width: 100%;
+		svg {
+			width: 100%;
+			height: inherit;
+			background-color: lime;
+		}
 	}
 }
