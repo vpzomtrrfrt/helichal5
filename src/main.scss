@@ -1,4 +1,7 @@
 .player {
+	&.transition {
+		transition: transform 1s;
+	}
 	.eye {
 		fill: yellow;
 		.pupil {
@@ -12,7 +15,7 @@
 }
 
 .score {
-	font-size: .3em;
+	font-size: .4em;
 	&.newHigh {
 		fill: red
 	}
@@ -23,10 +26,13 @@
 }
 
 .menuText {
-	font-family: monospace;
 	&.small {
-		font-size: .4em;
+		font-size: .5em;
 	}
+}
+
+.gamemodeName {
+	font-size: .5em;
 }
 
 * {
@@ -54,6 +60,7 @@ body {
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
+		font-family: monospace;
 
 		* {
 			user-select: none
