@@ -49,7 +49,7 @@ var GameModes = (function() {
 			name: name,
 			playerSpeed: 1,
 			platformSpeed: 1,
-			platformSpeedX: 1
+			platformSpeedX: 0
 		};
 		if(extra) {
 			for(var k in extra) {
