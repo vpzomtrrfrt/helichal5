@@ -28,6 +28,9 @@ var States = {
 		dead: true,
 		playerTransition: true
 	},
+	PAUSED: {
+		pauseMenu: true
+	},
 	HOME: {
 		noGame: true,
 		mainMenu: true,
@@ -184,11 +187,13 @@ export default class App extends React.Component {
 				transform: "translateX("+(this.state.state.pauseMenu?"0":"100%")+")",
 				opacity: this.state.state.pauseMenu?1:0
 			}} className={'pauseMenu' + (this.state.state.noPauseMenu ? ' noTransition': '')}>
-				<text x="50%" y="40%" textAnchor="middle">You Died!</text>
+				<text x="50%" y="40%" textAnchor="middle">
+					{this.state.state.dead ? 'You Died!' : 'Paused'}
+				</text>
 				{this.state.state.dead && (
 					<text x="50%" y="45%" className={'score'+(this.state.newHighScore ? ' newHigh' : '')} textAnchor="middle">{this.state.newHighScore && 'New High '}Score: {this.state.score}</text>
 				)}
-				<g className="replayBtn" onClick={this.restart.bind(this)}>
+				<g className="replayBtn" onClick={this.resume.bind(this)}>
 					<rect x="35%" y="50%" width="30%" height="10%" rx="6%" ry="4%" fill="lime" />
 					<path d="M 45 77.5 l 0 10 l 10 -5" fill="yellow" />
 				</g>
@@ -223,9 +228,23 @@ export default class App extends React.Component {
 	restart() {
 		this.start(this.state.mode);
 	}
+	resume() {
+		if(this.state.state.dead) {
+			restart();
+		}
+		else {
+			this.state.state = States.INGAME;
+		}
+	}
 	componentDidMount() {
 		console.log(this);
 		MainLoop.setUpdate(this.updateLoop.bind(this)).setDraw(() => this.forceUpdate()).start();
+		input.blur = () => {
+			console.log("blur");
+			if(this.state.state === States.INGAME) {
+				this.state.state = States.PAUSED;
+			}
+		};
 	}
 	updateLoop() {
 		this.state.dx = input.getX();
@@ -355,6 +374,8 @@ window.onkeyup = (evt) => {
 		input.downKey = false;
 	}
 }
+
+window.onblur = () => input.blur();
 
 window.ondeviceorientation = function(e) {
 	input.tiltX = Math.min(5, Math.max(-5, e.gamma/9));
