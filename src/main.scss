@@ -1,6 +1,7 @@
 .player {
+	transition: fill 1000ms;
 	&.transition {
-		transition: transform 1s;
+		transition: transform 1000ms, fill 1000ms;
 	}
 	.eye {
 		fill: yellow;
@@ -23,6 +24,7 @@
 
 .overlay {
 	fill: rgba(255, 255, 255, 0.4);
+	transition: opacity 1s;
 }
 
 .menuText {
@@ -33,6 +35,12 @@
 
 .gamemodeName {
 	font-size: .5em;
+}
+
+.pauseMenu {
+	&:not(.noTransition) {
+		transition: transform 1000ms, opacity 1s;
+	}
 }
 
 * {

@@ -32,7 +32,8 @@ var States = {
 		noGame: true,
 		mainMenu: true,
 		clickStart: true,
-		playerTransition: true
+		playerTransition: true,
+		noPauseMenu: true
 	},
 	STARTING: {
 		playerTransition: true,
@@ -77,9 +78,12 @@ export default class App extends React.Component {
 		if(e) {
 			e.stopPropagation();
 		}
-		this.state.state = States.HOME;
-		this.state.menuTextX = 0;
-		this.state.menuTextVel = 0.4;
+		this.state = {
+			state: States.HOME,
+			menuTextX: 0,
+			menuTextVel: 0.4,
+			color: this.state.color
+		};
 	}
 	start(gamemode) {
 		this.state = {
@@ -117,8 +121,13 @@ export default class App extends React.Component {
 					{this.highScore > -1 && (<text x="100%" y="149px" textAnchor="end" className={'score'+(this.state.newHighScore?' newHigh':'')}>High Score: {this.highScore}</text>)}
 				</g>)}
 			</g>)}
-			{this.state.state.pauseMenu && (<g>
-				<rect x="0" y="0" width="100px" height="150px" className="overlay" />
+			<rect x="0" y="0" width="100px" height="150px" className="overlay" style={{
+				opacity: this.state.state.pauseMenu?1:0
+			}} />
+			<g style={{
+				transform: "translateX("+(this.state.state.pauseMenu?"0":"100%")+")",
+				opacity: this.state.state.pauseMenu?1:0
+			}} className={'pauseMenu' + (this.state.state.noPauseMenu ? ' noTransition': '')}>
 				<text x="50%" y="40%" textAnchor="middle">You Died!</text>
 				{this.state.state.dead && (
 					<text x="50%" y="45%" className={'score'+(this.state.newHighScore ? ' newHigh' : '')} textAnchor="middle">{this.state.newHighScore && 'New High '}Score: {this.state.score}</text>
@@ -129,11 +138,11 @@ export default class App extends React.Component {
 				</g>
 				<g className="homeBtn" onClick={this.goHome.bind(this)}>
 					<rect x="35%" y="70%" width="30%" height="10%" rx="6%" ry="4%" fill="black" />
-					<path d="M 50 108 l 5 5 l 0 5 l -10 0 l 0 -5 z" fill="white" />
-					<rect x="48%" y="75%" width="4%" height="3%" fill="black" />
-					<circle cx="50%" cy="73.5%" r="0.5%" fill="black" />
+					<path d="M 50 107 l 5 5 l 0 5 l -10 0 l 0 -5 z" fill="white" />
+					<rect x="48%" y="74.5%" width="4%" height="3%" fill="black" />
+					<circle cx="50%" cy="73%" r="0.5%" fill="black" />
 				</g>
-			</g>)}
+			</g>
 			{this.state.state.mainMenu && (<g>
 				<text x={50 + this.state.menuTextX} y="50%" textAnchor="middle" className="menuText">Helichal</text>
 				<text x="50%" y="60%" textAnchor="middle" className="menuText small">Touch anywhere to play!</text>
@@ -260,5 +269,6 @@ window.onkeyup = (evt) => {
 }
 
 window.ondeviceorientation = function(e) {
-	input.tiltX = Math.min(5, e.gamma/9);
+	input.tiltX = Math.min(5, Math.max(-5, e.gamma/9));
+	input.tiltY = Math.min(5, Math.max(-5, e.beta/9));
 };
