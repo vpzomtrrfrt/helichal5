@@ -1,7 +1,9 @@
 import React from 'react';
 import Player from './Player.jsx';
 import Platform from './Platform.jsx';
-import MainLoop from 'mainloop.js'
+import ModeLabel from './ModeLabel.jsx';
+import { PlayButton, HomeButton } from './Button.jsx';
+import MainLoop from 'mainloop.js';
 
 var input = {
 	getX() {
@@ -41,6 +43,10 @@ var States = {
 	STARTING: {
 		playerTransition: true,
 		genPlatforms: true
+	},
+	Custom_CONFIG: {
+		customConfig: true,
+		noGame: true
 	}
 };
 
@@ -70,9 +76,8 @@ var GameModes = (function() {
 		Motion: create(3, "blue", "Motion", {
 			platformSpeedX: 1
 		}),
-		TapIt: create(4, "gray", "Tap It", {
-			tap: true
-		})
+		TapIt: create(4, "gray", "Tap It"),
+		Custom: create(5, "cyan", "Custom")
 	};
 })();
 
@@ -98,16 +103,50 @@ export default class App extends React.Component {
 	}
 	get playerSpeed() {
 		var tr = 1/5;
-		if(this.state.mode) {
-			tr *= this.state.mode.playerSpeed;
+		var modes = [];
+		if(this.state.mode == GameModes.Custom) {
+			for(var key in GameModes) {
+				if(this.state.chosenModes[key]) {
+					modes.push(GameModes[key]);
+				}
+			}
 		}
+		else if(this.state.mode) {
+			modes.push(this.state.mode);
+		}
+		modes.forEach((value) => tr *= value.playerSpeed);
 		return tr;
 	}
 	get platformSpeed() {
 		var tr = 2/5;
-		if(this.state.mode) {
-			tr *= this.state.mode.platformSpeed;
+		var modes = [];
+		if(this.state.mode == GameModes.Custom) {
+			for(var key in GameModes) {
+				if(this.state.chosenModes[key]) {
+					modes.push(GameModes[key]);
+				}
+			}
 		}
+		else if(this.state.mode) {
+			modes.push(this.state.mode);
+		}
+		modes.forEach((value) => tr *= value.platformSpeed);
+		return tr;
+	}
+	get platformSpeedX() {
+		var tr = 0;
+		var modes = [];
+		if(this.state.mode == GameModes.Custom) {
+			for(var key in GameModes) {
+				if(this.state.chosenModes[key]) {
+					modes.push(GameModes[key]);
+				}
+			}
+		}
+		else if(this.state.mode) {
+			modes.push(this.state.mode);
+		}
+		modes.forEach((value) => tr += value.platformSpeedX);
 		return tr;
 	}
 	constructor() {
@@ -129,7 +168,16 @@ export default class App extends React.Component {
 			color: this.state.color
 		};
 	}
-	start(gamemode) {
+	start(gamemode, choices) {
+		if(gamemode == GameModes.Custom && !choices) {
+			console.log("no choices");
+			this.state = {
+				state: States.Custom_CONFIG,
+				mode: gamemode,
+				chosenModes: {}
+			};
+			return;
+		}
 		this.state = {
 			x: 40,
 			y: 150-Player.height,
@@ -137,16 +185,29 @@ export default class App extends React.Component {
 			score: 0,
 			state: States.STARTING,
 			mode: gamemode,
-			color: pclrs[Math.floor(Math.random()*pclrs.length)]
+			color: pclrs[Math.floor(Math.random()*pclrs.length)],
+			chosenModes: choices
 		};
 		setTimeout(() => this.state.state = States.INGAME, 1000);
+	}
+	startCustom(choices) {
+		var modes = Object.keys(choices).filter(value => value);
+		if(modes.length === 0) {
+			this.start();
+		}
+		else if(modes.length === 1) {
+			this.start(GameModes[modes[0]]);
+		}
+		else {
+			this.start(GameModes.Custom, choices);
+		}
 	}
 	handleClick() {
 		if(this.state.state.clickStart) {
 			this.start();
 		}
 		else if(this.state.state.move) {
-			if(this.state.mode && this.state.mode.tap) {
+			if(this.isGM(GameModes.TapIt)) {
 				if(this.state.tappity < 0) {
 					this.state.tappity = Math.random()*(300-this.state.score/3);
 				}
@@ -193,35 +254,31 @@ export default class App extends React.Component {
 				{this.state.state.dead && (
 					<text x="50%" y="45%" className={'score'+(this.state.newHighScore ? ' newHigh' : '')} textAnchor="middle">{this.state.newHighScore && 'New High '}Score: {this.state.score}</text>
 				)}
-				<g className="replayBtn" onClick={this.resume.bind(this)}>
-					<rect x="35%" y="50%" width="30%" height="10%" rx="6%" ry="4%" fill="lime" />
-					<path d="M 45 77.5 l 0 10 l 10 -5" fill="yellow" />
-				</g>
-				<g className="homeBtn" onClick={this.goHome.bind(this)}>
-					<rect x="35%" y="70%" width="30%" height="10%" rx="6%" ry="4%" fill="black" />
-					<path d="M 50 107 l 5 5 l 0 5 l -10 0 l 0 -5 z" fill="white" />
-					<rect x="48%" y="74.5%" width="4%" height="3%" fill="black" />
-					<circle cx="50%" cy="73%" r="0.5%" fill="black" />
-				</g>
+				<PlayButton onClick={this.resume.bind(this)} y={75} />
+				<HomeButton y={105} onClick={this.goHome.bind(this)} />
 			</g>
 			{this.state.state.mainMenu && (<g>
 				<text x={50 + this.state.menuTextX} y="50%" textAnchor="middle" className="menuText">Helichal</text>
 				<text x="50%" y="60%" textAnchor="middle" className="menuText small">Touch anywhere to play!</text>
 				{Object.keys(GameModes).map((key, index) => {
 					var y = (97.5-index*5);
-					return (<g key={key} onClick={(evt) => {
-						evt.stopPropagation();
-						this.start(GameModes[key]);
-					}}>
-						<rect x="0" y={(y-2.5)+"%"} width="100%" height="5%" fill={GameModes[key].color} />
-						<text className="gamemodeName" x="50%" y={y+"%"} textAnchor="middle" dominantBaseline="middle">{GameModes[key].name} Mode?</text>
-					</g>);
+					return (<ModeLabel y={y} onClick={() => this.start(GameModes[key])} mode={GameModes[key]} punctuation="?" key={key} />);
 				})}
 			</g>)}
 
 			{this.state.mode && (<g>
-				<rect x="0" y="0" width="100%" height="5%" fill={this.state.mode.color} />
-				<text x="50%" y="2.5%" textAnchor="middle" className="gamemodeName" dominantBaseline="middle">{this.state.mode.name} Mode!</text>
+				<ModeLabel y={2.5} mode={this.state.mode} punctuation="!" />
+			</g>)}
+
+			{this.state.state.customConfig && (<g>
+				{Object.keys(GameModes).filter((mode) => {
+					return mode != "Custom";
+				}).map((key, index) => {
+					var y = 20+index*10;
+					return (<ModeLabel y={y} onClick={() => this.state.chosenModes[key] = !this.state.chosenModes[key]} mode={GameModes[key]} punctuation={this.state.chosenModes[key]?'!':'?'} key={key} />);
+				})}
+				<PlayButton x={55} y={120} onClick={() => this.startCustom(this.state.chosenModes)} />
+				<HomeButton x={15} y={120} onClick={this.goHome.bind(this)} />
 			</g>)}
 		</svg>);
 	}
@@ -230,7 +287,7 @@ export default class App extends React.Component {
 	}
 	resume() {
 		if(this.state.state.dead) {
-			restart();
+			this.restart();
 		}
 		else {
 			this.state.state = States.INGAME;
@@ -249,7 +306,7 @@ export default class App extends React.Component {
 	updateLoop() {
 		this.state.dx = input.getX();
 		if(this.state.state.move) {
-			if(this.state.mode && this.state.mode.tap) {
+			if(this.isGM(GameModes.TapIt)) {
 				if(this.state.tappity === undefined) {
 					this.state.tappity = 20;
 				}
@@ -279,7 +336,7 @@ export default class App extends React.Component {
 				platform.y += this.platformSpeed;
 
 				if(this.state.mode) {
-					platform.x += this.state.mode.platformSpeedX*platform.direction/5;
+					platform.x += this.platformSpeedX*platform.direction/5;
 					if(platform.x > 70) {
 						platform.x = 70-(platform.x-70);
 						platform.direction = -platform.direction;
@@ -342,7 +399,19 @@ export default class App extends React.Component {
 		}
 	}
 	isGM(mode) {
-		return this.state.mode == mode;
+		if(this.state.mode == mode) {
+			return true;
+		}
+		else if(this.state.mode == GameModes.Custom) {
+			if(this.state.chosenModes) {
+				for(var key in this.state.chosenModes) {
+					if(GameModes[key] == mode) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }
 
