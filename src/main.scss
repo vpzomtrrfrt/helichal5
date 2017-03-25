@@ -12,7 +12,10 @@
 }
 
 .score {
-	font-size: .5em
+	font-size: .3em;
+	&.newHigh {
+		fill: red
+	}
 }
 
 .overlay {

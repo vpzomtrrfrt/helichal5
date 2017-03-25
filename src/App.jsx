@@ -28,8 +28,20 @@ var States = {
 };
 
 var pclrs = ["red", "lime", "cyan", "orange"];
-
 export default class App extends React.Component {
+	get highScoreKey() {
+		return "helichalHighscore";
+	}
+	get highScore() {
+		var hsk = this.highScoreKey;
+		if(hsk in localStorage) {
+			return parseInt(localStorage.getItem(hsk));
+		}
+		return -1;
+	}
+	set highScore(value) {
+		localStorage.setItem(this.highScoreKey, value);
+	}
 	constructor() {
 		super();
 		this.goHome();
@@ -63,11 +75,17 @@ export default class App extends React.Component {
 			{!this.state.state.noGame && (<g>
 				<Player x={this.state.x} dx={this.state.dx} dead={this.state.state.dead} color={this.state.color}></Player>
 				{this.state.platforms.map((platform, index) => <Platform key={platform.id} x={platform.x} y={platform.y} />)}
-				<text x="0" y="149px" className="score">Score: {this.state.score}</text>
+				{!this.state.state.dead && (<g>
+					<text x="0" y="149px" className="score">Score: {this.state.score}</text>
+					{this.highScore > -1 && (<text x="100%" y="149px" textAnchor="end" className={'score'+(this.state.newHighScore?' newHigh':'')}>High Score: {this.highScore}</text>)}
+				</g>)}
 			</g>)}
 			{this.state.state.pauseMenu && (<g>
 				<rect x="0" y="0" width="100px" height="150px" className="overlay" />
 				<text x="50%" y="40%" textAnchor="middle">You Died!</text>
+				{this.state.state.dead && (
+					<text x="50%" y="45%" className={'score'+(this.state.newHighScore ? ' newHigh' : '')} textAnchor="middle">{this.state.newHighScore && 'New High '}Score: {this.state.score}</text>
+				)}
 				<g className="replayBtn" onClick={this.restart.bind(this)}>
 					<rect x="35%" y="50%" width="30%" height="10%" rx="6%" ry="4%" fill="lime" />
 					<path d="M 45 77.5 l 0 10 l 10 -5" fill="yellow" />
@@ -116,6 +134,10 @@ export default class App extends React.Component {
 				var tr = platform.y < 150;
 				if(!tr) {
 					this.state.score++;
+					if(this.state.score > this.highScore) {
+						this.highScore = this.state.score;
+						this.state.newHighScore = true;
+					}
 				}
 				return tr;
 			});
