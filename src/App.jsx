@@ -48,7 +48,8 @@ var GameModes = (function() {
 			color: color,
 			name: name,
 			playerSpeed: 1,
-			platformSpeed: 1
+			platformSpeed: 1,
+			platformSpeedX: 1
 		};
 		if(extra) {
 			for(var k in extra) {
@@ -58,7 +59,14 @@ var GameModes = (function() {
 		return tr;
 	}
 	return {
-		FreeFly: create(1, "red", "Free Fly")
+		FreeFly: create(1, "red", "Free Fly"),
+		Lightning: create(2, "yellow", "Lightning", {
+			platformSpeed: 2.85,
+			playerSpeed: 1.2
+		}),
+		Motion: create(3, "blue", "Motion", {
+			platformSpeedX: 1
+		})
 	};
 })();
 
@@ -116,7 +124,7 @@ export default class App extends React.Component {
 		this.state = {
 			x: 40,
 			y: 150-Player.height,
-			platforms: [{x: 35, y: 100, id: 1}],
+			platforms: [{x: 35, y: 100, id: 1, direction: 0}],
 			score: 0,
 			state: States.STARTING,
 			mode: gamemode,
@@ -220,6 +228,18 @@ export default class App extends React.Component {
 			this.state.platforms.forEach((platform) => {
 				platform.y += this.platformSpeed;
 
+				if(this.state.mode) {
+					platform.x += this.state.mode.platformSpeedX*platform.direction/5;
+					if(platform.x > 70) {
+						platform.x = 70-(platform.x-70);
+						platform.direction = -platform.direction;
+					}
+					if(platform.x < 0) {
+						platform.x = -platform.x;
+						platform.direction = -platform.direction;
+					}
+				}
+
 				var py = this.state.y;
 				if(py < platform.y+Platform.height && py+Player.height > platform.y && (this.state.x < platform.x || this.state.x+Player.width > platform.x+30)) {
 					console.log("death by:", platform);
@@ -243,9 +263,14 @@ export default class App extends React.Component {
 				if(this.state.platforms[this.state.platforms.length-1].y > Math.min(this.state.y, 0)) {
 					var lp = this.state.platforms[this.state.platforms.length-1];
 					var npx = Math.floor(Math.random()*80);
-					var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*(this.isGM(2)?2:1)/((5-Math.random()*(4-this.state.score/100))), 150));
+					var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*(Math.pow(this.platformSpeed,1.6)+0.8)/((5-Math.random()*(4-this.state.score/100))), 150));
 					if(!isNaN(nph)) {
-						this.state.platforms.push({x: npx, y: nph, id: Math.random()});
+						this.state.platforms.push({
+							x: npx,
+							y: nph,
+							id: Math.random(),
+							direction: 1
+						});
 					}
 				}
 			}
