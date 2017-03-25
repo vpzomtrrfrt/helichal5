@@ -16,25 +16,9 @@ export default class App extends React.Component {
 		};
 	}
 	render() {
-		return (<svg width="100px" height="200px" onKeyDown={this.keyPress} onKeyUp={this.keyUp} tabIndex="1">
+		return (<svg viewBox="0 0 100 150">
 			<Player x={this.state.x}></Player>
 		</svg>);
-	}
-	keyPress(evt) {
-		if(evt.keyCode === 37) {
-			input.leftKey = true;
-		}
-		if(evt.keyCode === 39) {
-			input.rightKey = true;
-		}
-	}
-	keyUp(evt) {
-		if(evt.keyCode === 37) {
-			input.leftKey = false;
-		}
-		if(evt.keyCode === 39) {
-			input.rightKey = false;
-		}
 	}
 	componentDidMount() {
 		console.log(this);
@@ -48,5 +32,22 @@ export default class App extends React.Component {
 		else if(this.state.x <= 0) {
 			this.state.x = 0;
 		}
+	}
+}
+
+window.onkeydown = (evt) => {
+	if(evt.keyCode === 37) {
+		input.leftKey = true;
+	}
+	if(evt.keyCode === 39) {
+		input.rightKey = true;
+	}
+};
+window.onkeyup = (evt) => {
+	if(evt.keyCode === 37) {
+		input.leftKey = false;
+	}
+	if(evt.keyCode === 39) {
+		input.rightKey = false;
 	}
 }

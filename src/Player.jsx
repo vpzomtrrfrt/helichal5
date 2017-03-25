@@ -14,7 +14,7 @@ export default class Player extends React.Component {
 		super();
 	}
 	render() {
-		return (<g className="player" style={{transform: "translate("+this.props.x+"px, 180px)"}}>
+		return (<g className="player" style={{transform: "translate("+this.props.x+"px, 130px)"}}>
 			<rect width="20px" height="20px"></rect>
 			<Eye x="4px" y="4px" />	
 			<Eye x="12px" y="4px" />	
