@@ -66,6 +66,9 @@ var GameModes = (function() {
 		}),
 		Motion: create(3, "blue", "Motion", {
 			platformSpeedX: 1
+		}),
+		TapIt: create(4, "gray", "Tap It", {
+			tap: true
 		})
 	};
 })();
@@ -109,6 +112,9 @@ export default class App extends React.Component {
 		this.state = {};
 		this.goHome();
 	}
+	die() {
+		this.state.state = States.DEAD;
+	}
 	goHome(e) {
 		if(e) {
 			e.stopPropagation();
@@ -136,6 +142,16 @@ export default class App extends React.Component {
 		if(this.state.state.clickStart) {
 			this.start();
 		}
+		else if(this.state.state.move) {
+			if(this.state.mode && this.state.mode.tap) {
+				if(this.state.tappity < 0) {
+					this.state.tappity = Math.random()*(300-this.state.score/3);
+				}
+				else {
+					this.die();
+				}
+			}
+		}
 	}
 	render() {
 		var py, px;
@@ -154,6 +170,11 @@ export default class App extends React.Component {
 				{!this.state.state.dead && (<g>
 					<text x="0" y="149px" className="score">Score: {this.state.score}</text>
 					{this.highScore > -1 && (<text x="100%" y="149px" textAnchor="end" className={'score'+(this.state.newHighScore?' newHigh':'')}>High Score: {this.highScore}</text>)}
+				</g>)}
+
+				{this.state.tappity < 0 && (<g className="tappity">
+					<text x="50%" y="50%" textAnchor="middle">TAP!</text>
+					<rect x="35%" y="55%" width={(30+this.state.tappity*30/120)+"%"} height="5%" />
 				</g>)}
 			</g>)}
 			<rect x="0" y="0" width="100px" height="150px" className="overlay" style={{
@@ -209,6 +230,16 @@ export default class App extends React.Component {
 	updateLoop() {
 		this.state.dx = input.getX();
 		if(this.state.state.move) {
+			if(this.state.mode && this.state.mode.tap) {
+				if(this.state.tappity === undefined) {
+					this.state.tappity = 20;
+				}
+				this.state.tappity -= (1+(this.state.score/400));
+				if(this.state.tappity < -120) {
+					this.die();
+				}
+			}
+
 			this.state.x += this.state.dx*this.playerSpeed;
 			if(this.state.x >= 100-Player.width) {
 				this.state.x = 100-Player.width;
@@ -243,7 +274,7 @@ export default class App extends React.Component {
 				var py = this.state.y;
 				if(py < platform.y+Platform.height && py+Player.height > platform.y && (this.state.x < platform.x || this.state.x+Player.width > platform.x+30)) {
 					console.log("death by:", platform);
-					this.state.state = States.DEAD;
+					this.die();
 				}
 			});
 			this.state.platforms = this.state.platforms.filter(platform => {
