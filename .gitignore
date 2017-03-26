@@ -1,5 +1,4 @@
 dist
 node_modules
-app/www
 app/platforms/android
 app/plugins
