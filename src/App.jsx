@@ -78,6 +78,10 @@ var GameModes = (function() {
 			platformSpeedX: 1
 		}),
 		TapIt: create(4, "gray", "Tap It"),
+		Insanity: create(6, "magenta", "Insane", {
+			platformSpeed: 5.7,
+			playerSpeed: 2.4
+		}),
 		Custom: create(5, "cyan", "Custom")
 	};
 })();
@@ -87,6 +91,12 @@ export default class App extends React.Component {
 	get highScoreKey() {
 		if(!this.state.mode) {
 			return "helichalHighscore";
+		}
+		else if(this.state.mode == GameModes.Custom) {
+			var modes = Object.keys(GameModes).filter((key) => {
+				return this.state.chosenModes && this.state.chosenModes[key];
+			}).map((key) => GameModes[key].id);
+			return "helichalGMCustom"+modes+"HS";
 		}
 		else {
 			return "helichalGM"+this.state.mode.id+"HS";
