@@ -2,4 +2,5 @@ dist
 node_modules
 app/platforms/android
 app/plugins
+app/icon.png
 !app/plugins/android.json

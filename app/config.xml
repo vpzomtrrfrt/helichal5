@@ -10,6 +10,5 @@
 	<preference name="permissions" value="none"/>
 	<preference name="orientation" value="portrait"/>
 	<preference name="fullscreen" value="true"/>
-	<!--<icon src="www/icon.png" />-->
 	<access origin="*" />
 </widget>
