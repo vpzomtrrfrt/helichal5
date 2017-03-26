@@ -51,6 +51,12 @@ var States = {
 	}
 };
 
+var Achievements = {
+	Strobe: "CgkI7e2dvZIeEAIQAw",
+	Zero: "CgkI7e2dvZIeEAIQBQ",
+	Participation: "CgkI7e2dvZIeEAIQBg"
+};
+
 var strobe = false;
 
 var GameModes = (function() {
@@ -162,6 +168,22 @@ export default class App extends React.Component {
 		modes.forEach((value) => tr += value.platformSpeedX);
 		return tr;
 	}
+	unlockAchievement(id) {
+		console.log(id);
+		if(window.plugins.playGamesServices) {
+			var data = {achievementId: id};
+			console.log("passing "+JSON.stringify(data));
+			window.plugins.playGamesServices.unlockAchievement(data);
+		}
+	}
+	incrementAchievement(id, steps) {
+		console.log(id);
+		if(window.plugins.playGamesServices) {
+			var data = {achievementId: id, numSteps: steps || 1};
+			console.log("passing "+JSON.stringify(data));
+			window.plugins.playGamesServices.incrementAchievement(data);
+		}
+	}
 	constructor() {
 		super();
 		this.state = {};
@@ -169,6 +191,10 @@ export default class App extends React.Component {
 	}
 	die() {
 		this.state.state = States.DEAD;
+		if(this.state.score === 0) {
+			this.incrementAchievement(Achievements.Zero);
+		}
+		this.incrementAchievement(Achievements.Participation);
 	}
 	goHome(e) {
 		if(e) {
@@ -245,6 +271,7 @@ export default class App extends React.Component {
 					&& this.state.secret[2] > max*3/4 && this.state.secret[3] > max*3/4) {
 					console.log("success");
 					strobe = !strobe;
+					this.unlockAchievement(Achievements.Strobe);
 					this.state.secret = [];
 				}
 			}
@@ -297,6 +324,16 @@ export default class App extends React.Component {
 					var y = (97.5-index*5);
 					return (<ModeLabel y={y} onClick={() => this.start(GameModes[key])} mode={GameModes[key]} punctuation="?" key={key} />);
 				})}
+				{window.plugins && window.plugins.playGamesServices && (<g onClick={(evt) => {
+					window.plugins.playGamesServices.showAchievements();
+					evt.stopPropagation();
+				}} style={{
+					transform: "translateX(1px) scale(0.7,0.7)"
+				}}>
+					<circle cx="5%" cy="5%" r="4%" fill="black" />
+					<line x1="5%" y1="5%" x2="2%" y2="12%" className="achievementIconLine" />
+					<line x1="5%" y1="5%" x2="8%" y2="12%" className="achievementIconLine" />
+				</g>)}
 			</g>)}
 
 			{this.state.mode && (<g>
