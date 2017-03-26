@@ -1,2 +1,5 @@
 dist
 node_modules
+app/www
+app/platforms
+app/plugins
