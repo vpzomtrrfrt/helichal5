@@ -42,7 +42,8 @@ var States = {
 	},
 	STARTING: {
 		playerTransition: true,
-		genPlatforms: true
+		genPlatforms: true,
+		menuDead: true
 	},
 	Custom_CONFIG: {
 		customConfig: true,
@@ -249,7 +250,7 @@ export default class App extends React.Component {
 				opacity: this.state.state.pauseMenu?1:0
 			}} className={'pauseMenu' + (this.state.state.noPauseMenu ? ' noTransition': '')}>
 				<text x="50%" y="40%" textAnchor="middle">
-					{this.state.state.dead ? 'You Died!' : 'Paused'}
+					{(this.state.state.menuDead || this.state.state.dead) ? 'You Died!' : 'Paused'}
 				</text>
 				{this.state.state.dead && (
 					<text x="50%" y="45%" className={'score'+(this.state.newHighScore ? ' newHigh' : '')} textAnchor="middle">{this.state.newHighScore && 'New High '}Score: {this.state.score}</text>
