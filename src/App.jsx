@@ -283,7 +283,7 @@ export default class App extends React.Component {
 		</svg>);
 	}
 	restart() {
-		this.start(this.state.mode);
+		this.start(this.state.mode, this.state.chosenModes);
 	}
 	resume() {
 		if(this.state.state.dead) {
