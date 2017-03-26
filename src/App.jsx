@@ -60,14 +60,15 @@ var Achievements = {
 var strobe = false;
 
 var GameModes = (function() {
-	function create(id, color, name, extra) {
+	function create(id, color, name, leaderboard, extra) {
 		var tr = {
 			id: id,
 			color: color,
 			name: name,
 			playerSpeed: 1,
 			platformSpeed: 1,
-			platformSpeedX: 0
+			platformSpeedX: 0,
+			leaderboard: leaderboard
 		};
 		if(extra) {
 			for(var k in extra) {
@@ -77,20 +78,20 @@ var GameModes = (function() {
 		return tr;
 	}
 	return {
-		FreeFly: create(1, "red", "Free Fly"),
-		Lightning: create(2, "yellow", "Lightning", {
+		FreeFly: create(1, "red", "Free Fly", "CgkI7e2dvZIeEAIQBw"),
+		Lightning: create(2, "yellow", "Lightning", "CgkI7e2dvZIeEAIQCA", {
 			platformSpeed: 2.85,
 			playerSpeed: 1.2
 		}),
-		Motion: create(3, "blue", "Motion", {
+		Motion: create(3, "blue", "Motion", "CgkI7e2dvZIeEAIQCQ", {
 			platformSpeedX: 1
 		}),
-		TapIt: create(4, "gray", "Tap It"),
-		Insanity: create(6, "magenta", "Insane", {
+		TapIt: create(4, "gray", "Tap It", "CgkI7e2dvZIeEAIQCg"),
+		Insanity: create(6, "magenta", "Insane", "CgkI7e2dvZIeEAIQCw", {
 			platformSpeed: 5.7,
 			playerSpeed: 2.4
 		}),
-		Custom: create(5, "cyan", "Custom")
+		Custom: create(5, "cyan", "Custom", "CgkI7e2dvZIeEAIQDA")
 	};
 })();
 
@@ -176,6 +177,23 @@ export default class App extends React.Component {
 			window.plugins.playGamesServices.unlockAchievement(data);
 		}
 	}
+	submitScore(score) {
+		var board;
+		if(this.state.mode) {
+			board = this.state.mode.leaderboard;
+		}
+		else {
+			// normal mode
+			board = "CgkI7e2dvZIeEAIQAQ";
+		}
+		var data = {
+			score: score,
+			leaderboardId: board
+		};
+		if(window.plugins.playGamesServices) {
+			window.plugins.playGamesServices.submitScore(data);
+		}
+	}
 	incrementAchievement(id, steps) {
 		console.log(id);
 		if(window.plugins.playGamesServices) {
@@ -195,6 +213,7 @@ export default class App extends React.Component {
 			this.incrementAchievement(Achievements.Zero);
 		}
 		this.incrementAchievement(Achievements.Participation);
+		this.submitScore(this.state.score);
 	}
 	goHome(e) {
 		if(e) {
@@ -324,15 +343,27 @@ export default class App extends React.Component {
 					var y = (97.5-index*5);
 					return (<ModeLabel y={y} onClick={() => this.start(GameModes[key])} mode={GameModes[key]} punctuation="?" key={key} />);
 				})}
-				{window.plugins && window.plugins.playGamesServices && (<g onClick={(evt) => {
-					window.plugins.playGamesServices.showAchievements();
-					evt.stopPropagation();
-				}} style={{
-					transform: "translateX(1px) scale(0.7,0.7)"
-				}}>
-					<circle cx="5%" cy="5%" r="4%" fill="black" />
-					<line x1="5%" y1="5%" x2="2%" y2="12%" className="achievementIconLine" />
-					<line x1="5%" y1="5%" x2="8%" y2="12%" className="achievementIconLine" />
+				{window.plugins && window.plugins.playGamesServices && (<g>
+					<g onClick={(evt) => {
+						window.plugins.playGamesServices.showAchievements();
+						evt.stopPropagation();
+					}} style={{
+						transform: "translateX(1px) scale(0.7,0.7)"
+					}}>
+						<circle cx="5%" cy="5%" r="4%" fill="black" />
+						<line x1="5%" y1="5%" x2="2%" y2="12%" className="achievementIconLine" />
+						<line x1="5%" y1="5%" x2="8%" y2="12%" className="achievementIconLine" />
+					</g>
+					<g onClick={(evt) => {
+						window.plugins.playGamesServices.showAllLeaderboards();
+						evt.stopPropagation();
+					}} style={{
+						transform: "translate(89px, 2px)"
+					}}>
+						<line x1="0" y1="0" x2="0" y2="7%" className="achievementIconLine" />
+						<line x1="4%" y1="2%" x2="4%" y2="7%" className="achievementIconLine" />
+						<line x1="8%" y1="4%" x2="8%" y2="7%" className="achievementIconLine" />
+					</g>
 				</g>)}
 			</g>)}
 
