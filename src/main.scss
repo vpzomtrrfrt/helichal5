@@ -1,7 +1,14 @@
 .player {
-	transition: fill 1000ms;
+	&:not(.noFade) {
+		transition: fill 1000ms;
+	}
 	&.transition {
-		transition: transform 1000ms, fill 1000ms;
+		&:not(.noFade) {
+			transition: transform 1000ms, fill 1000ms;
+		}
+		.noFade {
+			transition: transform 1000ms
+		}
 	}
 	.eye {
 		fill: yellow;

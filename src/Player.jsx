@@ -43,7 +43,7 @@ export default class Player extends React.Component {
 		super();
 	}
 	render() {
-		return (<g className={'player' + (this.props.transition ? ' transition': '')} style={{transform: "translate("+this.props.x+"px, "+this.props.y+"px)", fill: this.props.color || "red"}}>
+		return (<g className={'player' + (this.props.transition ? ' transition': '') + (this.props.noFade ? ' noFade': '')} style={{transform: "translate("+this.props.x+"px, "+this.props.y+"px)", fill: this.props.color || "red"}}>
 			<rect width={Player.width} height={Player.height}></rect>
 			<Eye x={Player.width/5} y={Player.height/5} dx={this.props.dx} dead={this.props.dead} />
 			<Eye x={Player.width*3/5} y={Player.height/5} dx={this.props.dx} dead={this.props.dead} />

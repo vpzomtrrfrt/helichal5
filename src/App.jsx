@@ -51,6 +51,8 @@ var States = {
 	}
 };
 
+var strobe = false;
+
 var GameModes = (function() {
 	function create(id, color, name, extra) {
 		var tr = {
@@ -213,7 +215,8 @@ export default class App extends React.Component {
 			this.start(GameModes.Custom, choices);
 		}
 	}
-	handleClick() {
+	handleClick(data) {
+		var pos = {x: data.clientX, y: data.clientY};
 		if(this.state.state.clickStart) {
 			this.start();
 		}
@@ -224,6 +227,25 @@ export default class App extends React.Component {
 				}
 				else {
 					this.die();
+				}
+			}
+		}
+		else if(this.state.state.pauseMenu) {
+			if(!this.state.secret) {
+				this.state.secret = [];
+			}
+			this.state.secret.push(pos.y);
+			while(this.state.secret.length > 4) {
+				this.state.secret.unshift();
+			}
+			if(this.state.secret.length === 4) {
+				var max = Math.max(...this.state.secret);
+				console.log(max, this.state.secret);
+				if(this.state.secret[0] < max/4 && this.state.secret[1] < max/4
+					&& this.state.secret[2] > max*3/4 && this.state.secret[3] > max*3/4) {
+					console.log("success");
+					strobe = !strobe;
+					this.state.secret = [];
 				}
 			}
 		}
@@ -239,7 +261,7 @@ export default class App extends React.Component {
 			px = this.state.x;
 		}
 		return (<svg viewBox="0 0 100 150" onClick={this.handleClick.bind(this)}>
-			<Player x={px} dx={this.state.dx} dead={this.state.state.dead} color={this.state.color} y={py} transition={this.state.state.playerTransition}></Player>
+			<Player x={px} dx={this.state.dx} dead={this.state.state.dead} color={this.state.color} y={py} transition={this.state.state.playerTransition} noFade={strobe}></Player>
 			{!this.state.state.noGame && (<g>
 				{this.state.platforms.map((platform, index) => <Platform key={platform.id} x={platform.x} y={platform.y} />)}
 				{!this.state.state.dead && (<g>
@@ -315,6 +337,9 @@ export default class App extends React.Component {
 		};
 	}
 	updateLoop() {
+		if(strobe) {
+			this.state.color = pclrs[Math.floor(Math.random()*pclrs.length)];
+		}
 		this.state.dx = input.getX();
 		if(this.state.state.move) {
 			if(this.isGM(GameModes.TapIt)) {
@@ -381,7 +406,7 @@ export default class App extends React.Component {
 				if(this.state.platforms[this.state.platforms.length-1].y > Math.min(this.state.y, 0)) {
 					var lp = this.state.platforms[this.state.platforms.length-1];
 					var npx = Math.floor(Math.random()*80);
-					var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*(Math.pow(this.platformSpeed,1.6)+0.8)/((5-Math.random()*(4-this.state.score/100))), 150));
+					var nph = lp.y-Math.max(0, Math.min(30*(1-this.state.score/1000)+Math.abs(npx-lp.x)*Player.height*0.1*(Math.pow(this.platformSpeed,1.6)+0.8)/((5-Math.random()*(4-this.state.score/100))), 150));
 					if(!isNaN(nph)) {
 						this.state.platforms.push({
 							x: npx,
