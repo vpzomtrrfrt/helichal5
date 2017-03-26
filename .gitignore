@@ -2,3 +2,4 @@ dist
 node_modules
 app/platforms/android
 app/plugins
+!app/plugins/android.json

@@ -5,3 +5,10 @@ import App from './App.jsx';
 var game = (<App />);
 
 ReactDOM.render(game, document.getElementById('app'));
+
+document.addEventListener("deviceready", function() {
+	console.log("Ready", arguments);
+	if(window.admob) {
+		window.admob.createBannerView({publisherId: "ca-app-pub-4664438225935502/5637529873", bannerAtTop: true});
+	}
+});
