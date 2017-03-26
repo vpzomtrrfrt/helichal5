@@ -4,6 +4,7 @@ import Platform from './Platform.jsx';
 import ModeLabel from './ModeLabel.jsx';
 import { PlayButton, HomeButton } from './Button.jsx';
 import MainLoop from 'mainloop.js';
+import prefix from 'react-prefixer';
 
 var input = {
 	getX() {
@@ -171,7 +172,7 @@ export default class App extends React.Component {
 	}
 	unlockAchievement(id) {
 		console.log(id);
-		if(window.plugins.playGamesServices) {
+		if(App.playGames) {
 			var data = {achievementId: id};
 			console.log("passing "+JSON.stringify(data));
 			window.plugins.playGamesServices.unlockAchievement(data);
@@ -190,13 +191,13 @@ export default class App extends React.Component {
 			score: score,
 			leaderboardId: board
 		};
-		if(window.plugins.playGamesServices) {
+		if(App.playGames) {
 			window.plugins.playGamesServices.submitScore(data);
 		}
 	}
 	incrementAchievement(id, steps) {
 		console.log(id);
-		if(window.plugins.playGamesServices) {
+		if(App.playGames) {
 			var data = {achievementId: id, numSteps: steps || 1};
 			console.log("passing "+JSON.stringify(data));
 			window.plugins.playGamesServices.incrementAchievement(data);
@@ -323,10 +324,10 @@ export default class App extends React.Component {
 			<rect x="0" y="0" width="100px" height="150px" className="overlay" style={{
 				opacity: this.state.state.pauseMenu?1:0
 			}} />
-			<g style={{
+			<g style={prefix({
 				transform: "translateX("+(this.state.state.pauseMenu?"0":"100%")+")",
 				opacity: this.state.state.pauseMenu?1:0
-			}} className={'pauseMenu' + (this.state.state.noPauseMenu ? ' noTransition': '')}>
+			})} className={'pauseMenu' + (this.state.state.noPauseMenu ? ' noTransition': '')}>
 				<text x="50%" y="40%" textAnchor="middle">
 					{(this.state.state.menuDead || this.state.state.dead) ? 'You Died!' : 'Paused'}
 				</text>
@@ -343,13 +344,13 @@ export default class App extends React.Component {
 					var y = (97.5-index*5);
 					return (<ModeLabel y={y} onClick={() => this.start(GameModes[key])} mode={GameModes[key]} punctuation="?" key={key} />);
 				})}
-				{window.plugins && window.plugins.playGamesServices && (<g>
+				{App.playGames && (<g>
 					<g onClick={(evt) => {
 						window.plugins.playGamesServices.showAchievements();
 						evt.stopPropagation();
-					}} style={{
+					}} style={prefix({
 						transform: "translateX(1px) scale(0.7,0.7)"
-					}}>
+					})}>
 						<circle cx="5%" cy="5%" r="4%" fill="black" />
 						<line x1="5%" y1="5%" x2="2%" y2="12%" className="achievementIconLine" />
 						<line x1="5%" y1="5%" x2="8%" y2="12%" className="achievementIconLine" />
@@ -357,9 +358,9 @@ export default class App extends React.Component {
 					<g onClick={(evt) => {
 						window.plugins.playGamesServices.showAllLeaderboards();
 						evt.stopPropagation();
-					}} style={{
+					}} style={prefix({
 						transform: "translate(89px, 2px)"
-					}}>
+					})}>
 						<line x1="0" y1="0" x2="0" y2="7%" className="achievementIconLine" />
 						<line x1="4%" y1="2%" x2="4%" y2="7%" className="achievementIconLine" />
 						<line x1="8%" y1="4%" x2="8%" y2="7%" className="achievementIconLine" />
@@ -381,6 +382,10 @@ export default class App extends React.Component {
 				<PlayButton x={55} y={120} onClick={() => this.startCustom(this.state.chosenModes)} />
 				<HomeButton x={15} y={120} onClick={this.goHome.bind(this)} />
 			</g>)}
+			<g className="border">
+				<rect x="0" y="100%" width="100%" height="20" />
+				<rect x="0" y="-20" width="100%" height="20" />
+			</g>
 		</svg>);
 	}
 	restart() {

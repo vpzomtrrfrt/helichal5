@@ -1,4 +1,5 @@
 import React from 'react';
+import prefix from 'react-prefixer';
 
 var DEAD_EYES = false;
 
@@ -24,7 +25,7 @@ class Eye extends React.Component {
 		if(dir === -1) px = 0;
 		if(dir === 1) px = 2;
 
-		return (<g className="eye" style={{transform: "translate("+this.props.x+"px,"+this.props.y+"px)"}}>
+		return (<g className="eye" style={prefix({transform: "translate("+this.props.x+"px,"+this.props.y+"px)"})}>
 			{this.props.dead && DEAD_EYES &&
 				<g>
 					<text textAnchor="middle" x={Player.width/10} y={Player.height/10} style={{fill: "black", fontSize: ".25em", fontFamily: "sans-serif"}} dominantBaseline="middle">x</text>
@@ -43,7 +44,7 @@ export default class Player extends React.Component {
 		super();
 	}
 	render() {
-		return (<g className={'player' + (this.props.transition ? ' transition': '') + (this.props.noFade ? ' noFade': '')} style={{transform: "translate("+this.props.x+"px, "+this.props.y+"px)", fill: this.props.color || "red"}}>
+		return (<g className={'player' + (this.props.transition ? ' transition': '') + (this.props.noFade ? ' noFade': '')} style={prefix({transform: "translate("+this.props.x+"px, "+this.props.y+"px)", fill: this.props.color || "red"})}>
 			<rect width={Player.width} height={Player.height}></rect>
 			<Eye x={Player.width/5} y={Player.height/5} dx={this.props.dx} dead={this.props.dead} />
 			<Eye x={Player.width*3/5} y={Player.height/5} dx={this.props.dx} dead={this.props.dead} />

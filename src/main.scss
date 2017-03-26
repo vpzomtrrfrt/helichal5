@@ -4,6 +4,7 @@
 	}
 	&.transition {
 		&:not(.noFade) {
+			transition: -webkit-transform 1000ms, fill 1000ms;
 			transition: transform 1000ms, fill 1000ms;
 		}
 		.noFade {
@@ -79,7 +80,6 @@ body {
 	width: 100%;
 	svg {
 		background-color: white;
-		object-fit: scale-down;
 		height: 100%;
 		position: absolute;
 		left: 50%;
@@ -102,6 +102,8 @@ body {
 			height: auto;
 			position: absolute;
 			bottom: 0;
+			left: 0;
+			transform: none
 		}
 	}
 }

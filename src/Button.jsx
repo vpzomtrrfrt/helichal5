@@ -1,8 +1,9 @@
 import React from 'react';
+import prefix from 'react-prefixer';
 
 export default class Button extends React.Component {
 	render() {
-		return (<g onClick={this.props.onClick} style={{transform: "translate("+(this.props.x || 35)+"px, "+this.props.y+"px)"}}>
+		return (<g onClick={this.props.onClick} style={prefix({transform: "translate("+(this.props.x || 35)+"px, "+this.props.y+"px)"})}>
 			<rect width="30%" height="10%" rx="6%" ry="4%" fill={this.props.color} />
 			{this.props.children}
 		</g>);

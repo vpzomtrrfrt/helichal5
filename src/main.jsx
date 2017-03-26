@@ -12,6 +12,9 @@ document.addEventListener("deviceready", function() {
 		window.admob.createBannerView({publisherId: "ca-app-pub-4664438225935502/5637529873", bannerAtTop: true, isTesting: true});
 	}
 	if(window.plugins.playGamesServices) {
-		window.plugins.playGamesServices.auth();
+		window.plugins.playGamesServices.auth(function() {
+			console.log("play games successful");
+			App.playGames = true;
+		});
 	}
 });
