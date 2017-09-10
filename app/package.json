@@ -1,0 +1,13 @@
+{
+    "name": "net.reederhome.colin.apps.helichal",
+    "version": "5.1.1",
+    "displayName": "Helichal",
+    "cordova": {
+        "platforms": [
+            "android"
+        ]
+    },
+    "dependencies": {
+        "cordova-android": "~6.2.3"
+    }
+}

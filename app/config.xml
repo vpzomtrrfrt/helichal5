@@ -1,14 +1,15 @@
-<?xml version="1.0"?>
+<?xml version='1.0' encoding='utf-8'?>
 <widget id="net.reederhome.colin.apps.helichal" version="5.1.1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
-	<name>Helichal</name>
-	<description>
+    <name>Helichal</name>
+    <description>
 		It might be a game
 	</description>
-	<author>
+    <author>
 		VpzomTrrfrt
 	</author>
-	<preference name="permissions" value="none"/>
-	<preference name="orientation" value="portrait"/>
-	<preference name="fullscreen" value="true"/>
-	<access origin="*" />
+    <preference name="permissions" value="none" />
+    <preference name="orientation" value="portrait" />
+    <preference name="fullscreen" value="true" />
+    <access origin="*" />
+    <engine name="android" spec="~6.2.3" />
 </widget>
