@@ -5,9 +5,15 @@
     "cordova": {
         "platforms": [
             "android"
-        ]
+        ],
+        "plugins": {
+            "cordova-plugin-play-games-services": {
+                "APP_ID": "1035752404717"
+            }
+        }
     },
     "dependencies": {
-        "cordova-android": "~6.2.3"
+        "cordova-android": "~6.2.3",
+        "cordova-plugin-play-games-services": "^1.0.0"
     }
 }

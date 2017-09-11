@@ -55,7 +55,8 @@ var States = {
 var Achievements = {
 	Strobe: "CgkI7e2dvZIeEAIQAw",
 	Zero: "CgkI7e2dvZIeEAIQBQ",
-	Participation: "CgkI7e2dvZIeEAIQBg"
+	Participation: "CgkI7e2dvZIeEAIQBg",
+	Achievement: "CgkI7e2dvZIeEAIQDQ"
 };
 
 var strobe = false;
@@ -346,6 +347,7 @@ export default class App extends React.Component {
 				})}
 				{App.playGames && (<g>
 					<g onClick={(evt) => {
+						this.unlockAchievement(Achievements.Achievement);
 						window.plugins.playGamesServices.showAchievements();
 						evt.stopPropagation();
 					}} style={prefix({
